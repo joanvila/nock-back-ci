@@ -1,28 +1,31 @@
 const path = require('path');
-const nockBackCI = require('../index');
+const NockBackCI = require('../index');
 const appProvider = require('./server');
 
 
-const regenenerateFixtures = true; // This would depend on the environment
-
-const FIXTURE_NAME = 'exampleFixture.json';
-const FIXTURE_DIR = path.join(__dirname, 'fixtures');
+const nockBackCiConfig = {
+  localEnvironment: true, // This would depend on the environment
+  fixtureName: 'exampleFixture.json',
+  fixtureDir: path.join(__dirname, 'fixtures'),
+  whitelistedHosts: /(localhost|127\.0\.0\.1|amazonaws)/,
+};
 
 let server = null;
-let testAct = null;
+let testCase = null;
+let nockBackCI = null;
 
 describe('acceptance test', () => {
   beforeAll(async () => {
-    nockBackCI.setupEnvironment(regenenerateFixtures, FIXTURE_DIR, FIXTURE_NAME);
+    nockBackCI = new NockBackCI(nockBackCiConfig);
     server = await nockBackCI.bootServer(appProvider);
   });
 
   beforeEach(async () => {
-    testAct = await nockBackCI.testActStart(FIXTURE_NAME);
+    testCase = await nockBackCI.testCaseInit();
   });
 
   afterEach(() => {
-    nockBackCI.testActStop(testAct);
+    nockBackCI.testCaseEnd(testCase);
   });
 
   afterAll((done) => {
