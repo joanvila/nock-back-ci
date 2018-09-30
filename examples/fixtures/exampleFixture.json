@@ -1,0 +1,17 @@
+[
+    {
+        "scope": "https://www.metaweather.com:443",
+        "method": "GET",
+        "path": "/api/location/search/?query=london",
+        "body": "",
+        "status": 200,
+        "response": [
+            {
+                "title": "London",
+                "location_type": "City",
+                "woeid": 44418,
+                "latt_long": "51.506321,-0.12714"
+            }
+        ]
+    }
+]

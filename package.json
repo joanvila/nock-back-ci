@@ -27,7 +27,8 @@
   },
   "homepage": "https://github.com/joanvila/nock-back-ci#readme",
   "dependencies": {
-    "nock": "^10.0.0"
+    "nock": "^10.0.0",
+    "supertest": "^3.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
@@ -35,6 +36,9 @@
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-skyscanner": "^3.0.0",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.1",
+    "express": "^4.16.3",
     "jest": "^23.6.0"
   },
   "jest": {
