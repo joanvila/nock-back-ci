@@ -1,0 +1,18 @@
+{
+  "extends": "skyscanner",
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "rules": {
+    "global-require": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.test.js"
+        ]
+      }
+    ]
+  }
+}

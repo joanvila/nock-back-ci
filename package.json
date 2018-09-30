@@ -1,0 +1,46 @@
+{
+  "name": "nock-back-ci",
+  "version": "0.1.0",
+  "description": "A simple acceptance testing helper optimised for complex CI problems",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint . --ext .js",
+    "test": "jest",
+    "coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joanvila/nock-back-ci.git"
+  },
+  "keywords": [
+    "test",
+    "nock",
+    "acceptance",
+    "ci",
+    "environment",
+    "integration"
+  ],
+  "author": "Joan Vila <vila.joan94@gmail.com> (http://joanvila.me)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joanvila/nock-back-ci/issues"
+  },
+  "homepage": "https://github.com/joanvila/nock-back-ci#readme",
+  "dependencies": {
+    "nock": "^10.0.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.6.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-skyscanner": "^3.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "jest": "^23.6.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  }
+}
