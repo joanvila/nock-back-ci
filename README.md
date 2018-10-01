@@ -1,5 +1,7 @@
 # nock-back-ci
 
+[![Build Status](https://travis-ci.org/joanvila/nock-back-ci.svg?branch=master)](https://travis-ci.org/joanvila/nock-back-ci)
+
 A simple acceptance testing helper optimised for complex CI problems
 
 ## Motivation
