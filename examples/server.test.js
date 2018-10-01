@@ -2,6 +2,7 @@ const path = require('path');
 const NockBackCI = require('../index');
 const appProvider = require('./server');
 
+jest.unmock('nock');
 
 const nockBackCiConfig = {
   localEnvironment: true, // This would depend on the environment
