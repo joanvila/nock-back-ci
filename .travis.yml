@@ -14,5 +14,3 @@ jobs:
       script: npm test
     - node_js: 8
       script: npm test
-    - node_js: 6
-      script: npm test
