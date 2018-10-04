@@ -2,15 +2,21 @@ const nock = require('nock');
 const fs = require('fs');
 const NockBackCI = require('../index');
 
-const existsSyncMock = jest.spyOn(fs, 'existsSync');
-const unlinkSyncMock = jest.spyOn(fs, 'unlinkSync');
-
-existsSyncMock.mockImplementation(() => true);
-unlinkSyncMock.mockImplementation(() => true);
+let existsSyncMock = null;
+let unlinkSyncMock = null;
 
 describe('NockBackCI', () => {
+  beforeEach(() => {
+    existsSyncMock = jest.spyOn(fs, 'existsSync');
+    unlinkSyncMock = jest.spyOn(fs, 'unlinkSync');
+
+    existsSyncMock.mockImplementation(() => true);
+    unlinkSyncMock.mockImplementation(() => true);
+  });
+
   afterEach(() => {
     jest.resetAllMocks();
+    jest.resetModules();
   });
 
   const defaultConfig = {
@@ -68,9 +74,8 @@ describe('NockBackCI', () => {
 
       expect(existsSyncMock).toBeCalledWith('fixtureDir/myFixture.json');
       expect(existsSyncMock).toBeCalledWith('fixtureDir/boot.json');
-      // TODO: Uncomenting the next two lines should make the test pass
-      // expect(unlinkSyncMock).toBeCalledWith('fixtureDir/myFixture.json');
-      // expect(unlinkSyncMock).toBeCalledWith('fixtureDir/boot.json');
+      expect(unlinkSyncMock).toBeCalledWith('fixtureDir/myFixture.json');
+      expect(unlinkSyncMock).toBeCalledWith('fixtureDir/boot.json');
     });
 
     it('doesnt remove the fixtures if they do not exists', () => {

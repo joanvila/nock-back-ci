@@ -6,11 +6,17 @@ const NockBackCI = require('../index');
 const existsSyncMock = jest.spyOn(fs, 'existsSync');
 existsSyncMock.mockImplementation(() => false);
 
+const nockBackImplementation = jest.fn();
+nockBackImplementation.prototype.setMode = jest.fn();
+// nockBackImplementation.setMode = jest.fn();
+
 const nockBackMock = jest.spyOn(nock, 'back');
+nockBackMock.mockImplementation(() => nockBackImplementation);
 
 describe('NockBackCI', () => {
   afterEach(() => {
     jest.resetAllMocks();
+    jest.resetModules();
   });
 
   describe('bootServer - with nock.back()', () => {
