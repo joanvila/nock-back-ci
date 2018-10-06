@@ -1,9 +1,35 @@
+const supertest = require('supertest');
 const nock = require('nock');
 const fs = require('fs');
 const NockBackCI = require('../index');
 
+
+jest.mock('nock', () => {
+  const back = jest.fn();
+  const restore = jest.fn();
+  const enableNetConnect = jest.fn();
+  return {
+    back,
+    restore,
+    enableNetConnect,
+  };
+});
+
+const mockServerGet = jest.fn();
+const mockServer = {
+  get: mockServerGet,
+};
+
+jest.mock('supertest', () => {
+  const agent = jest.fn();
+  return {
+    agent,
+  };
+});
+
 let existsSyncMock = null;
 let unlinkSyncMock = null;
+const nockDoneMock = jest.fn();
 
 describe('NockBackCI', () => {
   beforeEach(() => {
@@ -12,6 +38,12 @@ describe('NockBackCI', () => {
 
     existsSyncMock.mockImplementation(() => true);
     unlinkSyncMock.mockImplementation(() => true);
+
+    nock.back.mockImplementation(() => Promise.resolve({ nockDone: nockDoneMock }));
+    nock.back.setMode = jest.fn();
+
+    mockServerGet.mockImplementation(() => Promise.resolve({ statusCode: 200 }));
+    supertest.agent.mockImplementation(() => mockServer);
   });
 
   afterEach(() => {
@@ -95,51 +127,105 @@ describe('NockBackCI', () => {
     });
   });
 
-  describe('bootServer - without nock.back()', () => {
+  describe('bootServer', () => {
     const userConfig = {
       fixtureName: 'myFixture.json',
       fixtureDir: 'fixtureDir',
     };
 
-    it('sets the nock back mode to record', () => {
-      const appProviderMock = jest.fn();
-      const setModeMock = jest.spyOn(nock.back, 'setMode');
-      const nockBackCi = new NockBackCI(userConfig);
+    const appProviderMock = jest.fn();
 
-      nockBackCi.bootServer(appProviderMock);
-
-      expect(setModeMock).toHaveBeenCalledWith('record');
+    beforeEach(() => {
+      appProviderMock.mockImplementation(() => Promise.resolve('appMock'));
     });
 
-    // TODO: Test that we set the mode to wild at the end
+    it('sets the nock back mode to record', async () => {
+      const nockBackCi = new NockBackCI(userConfig);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(nock.back.setMode).toHaveBeenCalledWith('record');
+    });
+
+    it('starts recording fixtures', async () => {
+      const nockBackCi = new NockBackCI(userConfig);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(nock.back).toHaveBeenCalledWith(
+        'boot.json',
+        expect.any(Object),
+      );
+    });
+
+    it('enables the connection for the allowed hosts', async () => {
+      const userConfigWithWhitelistedHosts = {
+        ...userConfig,
+        whitelistedHosts: defaultConfig.whitelistedHosts,
+      };
+      const nockBackCi = new NockBackCI(userConfigWithWhitelistedHosts);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(nock.enableNetConnect).toHaveBeenCalledWith(
+        defaultConfig.whitelistedHosts,
+      );
+    });
+
+    it('returns the server created with the app provided by appProvider', async () => {
+      const nockBackCi = new NockBackCI(userConfig);
+
+      const server = await nockBackCi.bootServer(appProviderMock);
+
+      expect(appProviderMock).toHaveBeenCalledTimes(1);
+      expect(supertest.agent).toHaveBeenCalledWith('appMock');
+      expect(server).toBe(mockServer);
+    });
+
+    it('calls the healthcheck to boot the app', async () => {
+      const nockBackCi = new NockBackCI(userConfig);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(mockServerGet).toHaveBeenCalledWith('/operations/healthcheck');
+    });
+
+    it('calls nockDone', async () => {
+      const nockBackCi = new NockBackCI(userConfig);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(nockDoneMock).toHaveBeenCalled();
+    });
+
+    it('sets the nock back mode to wild', async () => {
+      const nockBackCi = new NockBackCI(userConfig);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(nock.back.setMode).toHaveBeenCalledWith('wild');
+    });
   });
 
-  describe('testCaseInit - without nock.back()', () => {
+  describe('testCaseInit', async () => {
     const userConfig = {
       fixtureName: 'myFixture.json',
       fixtureDir: 'fixtureDir',
       whitelistedHosts: 'localhost',
     };
 
-    it('sets the nock back mode to record', () => {
-      const setModeMock = jest.spyOn(nock.back, 'setMode');
+    it('sets the nock back mode to record', async () => {
       const nockBackCi = new NockBackCI(userConfig);
 
-      nockBackCi.testCaseInit();
+      await nockBackCi.testCaseInit();
 
-      expect(setModeMock).toHaveBeenCalledWith('record');
+      expect(nock.back.setMode).toHaveBeenCalledWith('record');
     });
 
-    it.skip('starts recording fixtures', () => {
-      // FIXME: it's not possible to mock the same file more then once, with different responses
-      // Either require nock after or let's test testCaseInit and bootServer in a different testfile
-      jest.doMock('nock', () => ({
-        back: jest.fn(),
-      }));
-
+    it('starts recording fixtures', async () => {
       const nockBackCi = new NockBackCI(userConfig);
 
-      nockBackCi.testCaseInit();
+      await nockBackCi.testCaseInit();
 
       expect(nock.back).toHaveBeenCalledWith(
         userConfig.fixtureName,
@@ -147,7 +233,31 @@ describe('NockBackCI', () => {
       );
     });
 
-    // TODO: Test the rest of stuff
+    it('enables the connection for the allowed hosts', async () => {
+      const userConfigWithWhitelistedHosts = {
+        ...userConfig,
+        whitelistedHosts: defaultConfig.whitelistedHosts,
+      };
+      const nockBackCi = new NockBackCI(userConfigWithWhitelistedHosts);
+
+      await nockBackCi.testCaseInit();
+
+      expect(nock.enableNetConnect).toHaveBeenCalledWith(
+        defaultConfig.whitelistedHosts,
+      );
+    });
+
+    it('returns the nockDone', async () => {
+      const userConfigWithWhitelistedHosts = {
+        ...userConfig,
+        whitelistedHosts: defaultConfig.whitelistedHosts,
+      };
+      const nockBackCi = new NockBackCI(userConfigWithWhitelistedHosts);
+
+      const nockDone = await nockBackCi.testCaseInit();
+
+      expect(nockDone).toBe(nockDoneMock);
+    });
   });
 
   describe('testCaseEnd', () => {
@@ -157,21 +267,20 @@ describe('NockBackCI', () => {
     };
 
     it('stops recording fixtures when called', () => {
-      const nockDoneMock = jest.fn();
+      const nockDoneParam = jest.fn();
       const nockBackCi = new NockBackCI(userConfig);
 
-      nockBackCi.testCaseEnd(nockDoneMock);
+      nockBackCi.testCaseEnd(nockDoneParam);
 
-      expect(nockDoneMock).toHaveBeenCalled();
+      expect(nockDoneParam).toHaveBeenCalled();
     });
 
     it('sets the nock back mode to wild', () => {
-      const setModeMock = jest.spyOn(nock.back, 'setMode');
       const nockBackCi = new NockBackCI(userConfig);
 
       nockBackCi.testCaseEnd(jest.fn());
 
-      expect(setModeMock).toHaveBeenCalledWith('wild');
+      expect(nock.back.setMode).toHaveBeenCalledWith('wild');
     });
   });
 
@@ -183,35 +292,33 @@ describe('NockBackCI', () => {
       fixtureDir: 'fixtureDir',
     };
 
-    const mockServer = {
+    const mockServerParam = {
       app: { close: mockCloseApp },
     };
 
     it('sets the nock back mode to wild', () => {
-      const setModeMock = jest.spyOn(nock.back, 'setMode');
       const nockBackCi = new NockBackCI(userConfig);
 
-      nockBackCi.killServer(mockServer, jest.fn());
+      nockBackCi.killServer(mockServerParam, jest.fn());
 
-      expect(setModeMock).toHaveBeenCalledWith('wild');
+      expect(nock.back.setMode).toHaveBeenCalledWith('wild');
     });
 
     it('closes the app', () => {
       const doneMock = jest.fn();
       const nockBackCi = new NockBackCI(userConfig);
 
-      nockBackCi.killServer(mockServer, doneMock);
+      nockBackCi.killServer(mockServerParam, doneMock);
 
       expect(mockCloseApp).toHaveBeenCalledWith(doneMock);
     });
 
     it('restores nock setings', () => {
-      const restoreMock = jest.spyOn(nock, 'restore');
       const nockBackCi = new NockBackCI(userConfig);
 
-      nockBackCi.killServer(mockServer, jest.fn());
+      nockBackCi.killServer(mockServerParam, jest.fn());
 
-      expect(restoreMock).toHaveBeenCalled();
+      expect(nock.restore).toHaveBeenCalled();
     });
   });
 });
