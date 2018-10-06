@@ -4,9 +4,11 @@
 
 const nockBack = {
   fixtures: null,
+  setMode: jest.fn(),
 };
 
 
 module.exports = {
   back: nockBack,
+  restore: jest.fn(),
 };
