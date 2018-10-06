@@ -1,7 +1,7 @@
 # nock-back-ci
 
 [![Build Status](https://travis-ci.org/joanvila/nock-back-ci.svg?branch=master)](https://travis-ci.org/joanvila/nock-back-ci)
-[![Coverage Status](https://coveralls.io/repos/github/joanvila/nock-back-ci/badge.svg)](https://coveralls.io/github/joanvila/nock-back-ci)g
+[![Coverage Status](https://coveralls.io/repos/github/joanvila/nock-back-ci/badge.svg?branch=master)](https://coveralls.io/github/joanvila/nock-back-ci?branch=master)
 
 A simple acceptance testing helper optimised for complex CI problems
 
