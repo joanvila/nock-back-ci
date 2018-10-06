@@ -1,6 +1,7 @@
 # nock-back-ci
 
 [![Build Status](https://travis-ci.org/joanvila/nock-back-ci.svg?branch=master)](https://travis-ci.org/joanvila/nock-back-ci)
+[![Coverage Status](https://coveralls.io/repos/github/joanvila/nock-back-ci/badge.svg)](https://coveralls.io/github/joanvila/nock-back-ci)g
 
 A simple acceptance testing helper optimised for complex CI problems
 
@@ -59,9 +60,7 @@ Check the `examples/server.test.js` example for inspiration.
 
 Items on the roadmap.
 
-- Set up travis ci
-- Add tests to the package
-- Add coverage report
+- Add tests to the lib/options file
 - Feature: Optional boot checking for healthcheck and configurable healthcheck endpoint
 - Feature: When to recreate local fixtures policy
 - Feature: Config validation
