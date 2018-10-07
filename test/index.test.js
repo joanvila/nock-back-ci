@@ -56,6 +56,7 @@ describe('NockBackCI', () => {
     fixtureName: 'fixture.json',
     fixtureDir: null,
     whitelistedHosts: /(localhost|127\.0\.0\.1)/,
+    healthcheck: null,
   };
 
   describe('constructor', () => {
@@ -63,6 +64,7 @@ describe('NockBackCI', () => {
       const userConfig = {
         fixtureName: 'myFixture.json',
         fixtureDir: 'fixtureDir',
+        healthcheck: '/operations/healthcheck',
       };
 
       const nockBackCi = new NockBackCI(userConfig);
@@ -72,6 +74,7 @@ describe('NockBackCI', () => {
         fixtureName: 'myFixture.json',
         fixtureDir: 'fixtureDir',
         whitelistedHosts: defaultConfig.whitelistedHosts,
+        healthcheck: '/operations/healthcheck',
       });
     });
 
@@ -182,12 +185,24 @@ describe('NockBackCI', () => {
       expect(server).toBe(mockServer);
     });
 
-    it('calls the healthcheck to boot the app', async () => {
+    it('does not call the healthcheck to boot the app if the endpoint is not provided', async () => {
       const nockBackCi = new NockBackCI(userConfig);
 
       await nockBackCi.bootServer(appProviderMock);
 
-      expect(mockServerGet).toHaveBeenCalledWith('/operations/healthcheck');
+      expect(mockServerGet).not.toHaveBeenCalled();
+    });
+
+    it('calls the healthcheck to boot the app if the endpoint is provided', async () => {
+      const configWithHealthcheck = {
+        ...userConfig,
+        healthcheck: '/healthcheck/endpoint',
+      };
+      const nockBackCi = new NockBackCI(configWithHealthcheck);
+
+      await nockBackCi.bootServer(appProviderMock);
+
+      expect(mockServerGet).toHaveBeenCalledWith('/healthcheck/endpoint');
     });
 
     it('calls nockDone', async () => {

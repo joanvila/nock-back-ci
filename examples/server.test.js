@@ -9,6 +9,7 @@ const nockBackCiConfig = {
   fixtureName: 'exampleFixture.json',
   fixtureDir: path.join(__dirname, 'fixtures'),
   whitelistedHosts: /(localhost|127\.0\.0\.1|amazonaws)/,
+  healthcheck: '/operations/healthcheck',
 };
 
 let server = null;
