@@ -7,7 +7,7 @@ A simple acceptance testing helper optimised for complex CI problems
 
 ## Motivation
 
-As responsible developers we want to test our NodeJS service with acceptance tests to simulate real traffic.
+As responsible developers we want to test our NodeJS services with acceptance tests to simulate real traffic.
 
 In a continuous deployment environment, the CI pipeline should be able to run those acceptance tests,
 however, the deployment of our service shouldn’t depend on an external service being up and running.
@@ -35,7 +35,7 @@ const NockBackCI = require('nock-back-ci');
 const appProvider = require('./yourapp');
 
 // The localEnvironment flag should be set to true when the environment is local
-// and false in the CI environment
+// and false in the CI environment. This is usually done via environment variables.
 const nockBackCiConfig = {
   localEnvironment: true,
   fixtureName: 'exampleFixture.json',
@@ -47,7 +47,7 @@ const server = await nockBackCI.bootServer(appProvider); // server is an instanc
 
 const testCase = await nockBackCI.testCaseInit();
 
-// Test your api now
+// Test your api here
 
 nockBackCI.testCaseEnd(testCase);
 nockBackCI.killServer(server, done);
@@ -56,12 +56,35 @@ nockBackCI.killServer(server, done);
 **Tip**: For the best experience place the usage of `nock-back-ci` in the `before/after` jest functions.
 Check the `examples/server.test.js` example for inspiration.
 
+## Extra options
+
+Optional features.
+
+### API Warmup
+
+In some cases, starting the api and having it ready to serve traffic may take a while.
+This is usually the case when it queries external services and warms up caches.
+
+If this is your case, by providing an optional `healthcheck` parameter to the `nock-back-ci` config,
+the test won't start until the healthcheck of the api becomes green.
+
+Moreover when using this functionality, a separate fixture named `boot.json` will be created to store
+the http responses of the services queried at startup time.
+
+```javascript
+const nockBackCiConfig = {
+  localEnvironment: true,
+  fixtureName: 'exampleFixture.json',
+  fixtureDir: path.join(__dirname, 'fixtures'),
+  healthcheck: '/operations/healthcheck', // The test won't start until this endpoint replies a 200
+};
+```
+
 ## Todo
 
 Items on the roadmap.
 
 - Add tests to the lib/options file
-- Feature: Optional boot checking for healthcheck and configurable healthcheck endpoint
 - Feature: When to recreate local fixtures policy
 - Feature: Config validation
 

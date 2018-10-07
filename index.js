@@ -11,6 +11,7 @@ const defaultConfig = {
   fixtureName: 'fixture.json',
   fixtureDir: null,
   whitelistedHosts: /(localhost|127\.0\.0\.1)/,
+  healthcheck: null,
 };
 
 
@@ -44,8 +45,9 @@ class NockBackCI {
     const app = await appProvider();
     const server = request.agent(app);
 
-    while (!healthChecked) {
-      const response = await server.get('/operations/healthcheck'); // eslint-disable-line no-await-in-loop
+    while (this.config.healthcheck && !healthChecked) {
+      // eslint-disable-next-line no-await-in-loop
+      const response = await server.get(this.config.healthcheck);
       if (response && response.statusCode === 200) {
         healthChecked = true;
       }
