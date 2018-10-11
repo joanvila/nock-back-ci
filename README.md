@@ -12,7 +12,7 @@ As responsible developers we want to test our NodeJS services with acceptance te
 In a continuous deployment environment, the CI pipeline should be able to run those acceptance tests,
 however, the deployment of our service shouldn’t depend on an external service being up and running.
 
-Moreover, to run our service, we may need to access ohter services that are not reachable from the CI pipeline.
+Moreover, to run our service, we may need to access other services that are not reachable from the CI pipeline.
 An example of this can be a secrets provider service.
 
 ## Solution
