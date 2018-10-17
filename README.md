@@ -8,14 +8,12 @@ A simple acceptance testing helper optimised for complex CI problems
 ## Motivation
 
 As responsible developers we want to test our NodeJS services with acceptance tests to simulate real traffic.
-In a continuous deployment environment, the CI pipeline should be able to run those acceptance tests reliably.
 
-The deployment of our service shouldn’t depend on an external service being up and running.
-Moreover, to run our service, we may need to access other services that are not reachable from the CI pipeline.
+In a continuous deployment environment, the CI pipeline should be able to run those acceptance tests, however, the deployment of our service shouldn’t depend on an external service being up and running. Moreover, to run our service, we may need to access other services that are not reachable from the CI pipeline.
 
 ## Solution
 
-When the acceptance tests are run locally, they will query the real external services. During this run,
+When the acceptance tests are run in local, they will query the real external services. During this run,
 the responses of all the external http calls will be stored in a fixture file.
 
 When the tests are run in the CI pipeline, instead of querying the external services,
