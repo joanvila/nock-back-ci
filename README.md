@@ -56,8 +56,6 @@ Check the `examples/server.test.js` example for inspiration.
 
 ## Extra options
 
-Optional features.
-
 ```javascript
 const nockBackCiConfig = {
   localEnvironment: true,
@@ -70,7 +68,7 @@ const nockBackCiConfig = {
 
 ### Security
 
-Keep in mind that nock-back-ci will record ALL http calls made by your service by default.
+Keep in mind that `nock-back-ci` will record ALL http calls made by your service by default.
 
 Please take care if your application sends or receives sensitive information like credentials, access keys, or users' personal information so that these data are not committed to your repository inside the fixutes.
 
