@@ -9,11 +9,7 @@ A simple acceptance testing helper optimised for complex CI problems
 
 As responsible developers we want to test our NodeJS services with acceptance tests to simulate real traffic.
 
-In a continuous deployment environment, the CI pipeline should be able to run those acceptance tests,
-however, the deployment of our service shouldn’t depend on an external service being up and running.
-
-Moreover, to run our service, we may need to access other services that are not reachable from the CI pipeline.
-An example of this can be a secrets provider service.
+In a continuous deployment environment, the CI pipeline should be able to run those acceptance tests, however, the deployment of our service shouldn’t depend on an external service being up and running. Moreover, to run our service, we may need to access other services that are not reachable from the CI pipeline.
 
 ## Solution
 
@@ -58,27 +54,33 @@ Check the `examples/server.test.js` example for inspiration.
 
 ## Extra options
 
-Optional features.
+```javascript
+const nockBackCiConfig = {
+  localEnvironment: true,
+  fixtureName: 'exampleFixture.json',
+  fixtureDir: path.join(__dirname, 'fixtures'),
+  whitelistedHosts: /(localhost|127\.0\.0\.1|kms.amazonaws)/,
+  healthcheck: '/operations/healthcheck', // The test won't start until this endpoint replies a 200
+};
+```
+
+### Security
+
+Keep in mind that `nock-back-ci` will record ALL http calls made by your service by default.
+
+Please take care if your application sends or receives sensitive information like credentials, access keys, or users' personal information so that these data are not committed to your repository inside the fixutes.
+
+To skip nocking for a particular endpoint, add it with the `whitelistedHosts` option to the `nock-back-ci` config like the example above.
 
 ### API Warmup
 
 In some cases, starting the api and having it ready to serve traffic may take a while.
 This is usually the case when it queries external services and warms up caches.
 
-If this is your case, by providing an optional `healthcheck` parameter to the `nock-back-ci` config,
-the test won't start until the healthcheck of the api becomes green.
+If this is your case, by providing an optional `healthcheck` parameter the test won't start until the healthcheck of the api becomes green.
 
 Moreover when using this functionality, a separate fixture named `boot.json` will be created to store
 the http responses of the services queried at startup time.
-
-```javascript
-const nockBackCiConfig = {
-  localEnvironment: true,
-  fixtureName: 'exampleFixture.json',
-  fixtureDir: path.join(__dirname, 'fixtures'),
-  healthcheck: '/operations/healthcheck', // The test won't start until this endpoint replies a 200
-};
-```
 
 ## Todo
 
