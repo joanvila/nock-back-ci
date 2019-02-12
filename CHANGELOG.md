@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0 - 2019-02-12
+
+### Changed
+- Keeping the latest request response in the fixutres instead of the first
+one in the case of duplicates
+
 ## 0.3.0 - 2019-02-12
 
 ### Added
