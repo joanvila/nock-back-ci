@@ -61,7 +61,20 @@ const nockBackCiConfig = {
   fixtureDir: path.join(__dirname, 'fixtures'),
   whitelistedHosts: /(localhost|127\.0\.0\.1|kms.amazonaws)/,
   healthcheck: '/operations/healthcheck', // The test won't start until this endpoint replies a 200
+  customFilter: (scope) => true,
 };
+```
+
+### Custom filters
+
+In order to avoid recording specific responses in the fixtures depending on their content, the `customFilter` extra option becomes handy.
+
+For example, the following custom filter would avoid recording empty responses to the fixture file:
+
+```javascript
+const nockBackCiConfig = {
+  customFilter: (scope) => scope.response,
+}
 ```
 
 ### Security

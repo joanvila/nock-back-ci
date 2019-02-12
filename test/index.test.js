@@ -57,6 +57,7 @@ describe('NockBackCI', () => {
     fixtureDir: null,
     whitelistedHosts: /(localhost|127\.0\.0\.1)/,
     healthcheck: null,
+    customFilter: () => true,
   };
 
   describe('constructor', () => {
@@ -65,6 +66,7 @@ describe('NockBackCI', () => {
         fixtureName: 'myFixture.json',
         fixtureDir: 'fixtureDir',
         healthcheck: '/operations/healthcheck',
+        customFilter: () => false,
       };
 
       const nockBackCi = new NockBackCI(userConfig);
@@ -75,7 +77,9 @@ describe('NockBackCI', () => {
         fixtureDir: 'fixtureDir',
         whitelistedHosts: defaultConfig.whitelistedHosts,
         healthcheck: '/operations/healthcheck',
+        customFilter: expect.any(Function),
       });
+      expect(nockBackCi.config.customFilter()).toBe(false);
     });
 
     it('sets nock back fixture directory', () => {

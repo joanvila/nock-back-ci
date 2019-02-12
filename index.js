@@ -12,13 +12,14 @@ const defaultConfig = {
   fixtureDir: null,
   whitelistedHosts: /(localhost|127\.0\.0\.1)/,
   healthcheck: null,
+  customFilter: () => true,
 };
 
 
 class NockBackCI {
   constructor(userConfig) {
     this.config = { ...defaultConfig, ...userConfig };
-    this.defaultOptions = getDefaultOptions(this.config.whitelistedHosts);
+    this.defaultOptions = getDefaultOptions(this.config.whitelistedHosts, this.config.customFilter);
 
     nock.back.fixtures = this.config.fixtureDir;
 

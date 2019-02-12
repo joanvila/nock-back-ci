@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.3.0 - 2019-02-12
+
+### Added
+- Custom filters to avoid recording requests depending on the response
+
 ## 0.2.0 - 2018-07-10
 
 ### Changed
